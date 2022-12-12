@@ -1,4 +1,4 @@
-/*const dataApi = fetch("http://localhost:3000/api/products");
+const dataApi = fetch("http://localhost:3000/api/products");
 
 dataApi
     .then(async (responseData) => {
@@ -47,4 +47,6 @@ dataApi
     .catch((err) => {
         console.log(err);
     });
-    */
+
+
+
