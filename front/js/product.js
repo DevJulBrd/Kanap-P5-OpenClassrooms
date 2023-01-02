@@ -45,9 +45,10 @@ dataProduct.then(async (responseData) => {
 
 const addStorage = (product) => {
     let productStorage = JSON.parse(localStorage.getItem("product"));
-    const result = productStorage.some((p)=> p.id === product.id && p.color === product.color);
-    console.log(result)
-     /*if (productStorage) {
+    //const result = productStorage.some((p)=> p.id === product.id && p.color === product.color);
+    //const exist = productStorage.findIndex(productStorage => productStorage == product.id);
+    //console.log(exist);
+     if (productStorage) {
         productStorage.push(product);
         localStorage.setItem('product', JSON.stringify(productStorage));
     }
@@ -55,7 +56,7 @@ const addStorage = (product) => {
         productStorage = [];
         productStorage.push(product);
         localStorage.setItem('product', JSON.stringify(productStorage));
-    }*/
+    }
 
 };
 
@@ -85,10 +86,10 @@ const goToCart = (e) => {
         return false;
     };
     
-    // Dirige l'utilisateur vers la page panier 
-   // document.location.href = document.location.origin + "/front/html/cart.html";
+    // Affiche de l'alerte
+    alert("Votre produit à bien était ajouté au panier");
 };
 
-// Envoye les informations sélectionnés par l'utilisateur et le dirige vers la page panier au click du bouton 
+// Envoye les informations sélectionnés par l'utilisateur et affiche un alerte confirmant l'ajoutau panier au click du bouton 
 const button = document.getElementById("addToCart");
 button.addEventListener("click", goToCart);
