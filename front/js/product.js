@@ -43,26 +43,43 @@ dataProduct.then(async (responseData) => {
     };    
 });
 
+
+// Fonction qui gère l'ajout des produit au local storage en respectant les conditions précisés
 const addStorage = (product) => {
-    let productStorage = JSON.parse(localStorage.getItem("product"));
-    //const result = productStorage.some((p)=> p.id === product.id && p.color === product.color);
-    //const exist = productStorage.findIndex(productStorage => productStorage == product.id);
-    //console.log(exist);
-     if (productStorage) {
-        productStorage.push(product);
-        localStorage.setItem('product', JSON.stringify(productStorage));
-    }
+    let productStorage = JSON.parse(localStorage.getItem("products"));
+    console.log(productStorage);
+    
+    
+    // Si le tableau contient déjà des produits 
+    if(productStorage) {
+        // On cherche si un produit aillant le même id et la même couleur est déjà dans le tableau
+        const result = productStorage.findIndex((p) => p.id == product.id && p.color == product.color);
+        // Si result est différent de -1, le produit existe dans le tableau
+        if(result !== -1){    
+            // On ajoute de 1 la quantité du produit déjà existant dans le tableau
+            productStorage[result].quantity++;
+        // Si result est égal a -1; le produit n'existe pas dans le tableau
+        } else {
+            // On ajoute donc ce nouveau produit au tableau 
+            productStorage.push(product);
+        }
+    } 
+    // Si le tableau est vide
     else {
+        // On initialise le tableau
         productStorage = [];
         productStorage.push(product);
-        localStorage.setItem('product', JSON.stringify(productStorage));
-    }
+    };
+        
+    
+    // On réinitialise la valeur product dans le local storage
+    localStorage.setItem("products", JSON.stringify(productStorage));
 
 };
 
-// Fonction qui envoye les informations sélectionné par l'utilisateur et le dirige vers la page panier
-const goToCart = (e) => {
-    // Récupération des infos sélectionné par l'utilisateur mises dans un tableau 
+// Fonction qui envoye les informations sélectionné par l'utilisateur et l'averti si le produit a bien était ajouter au panier
+const addToCart = (e) => {
+    // Récupération des infos sélectionnés par l'utilisateur mises dans un tableau 
     const color = document.getElementById("colors").value;
     const quantity = document.getElementById("quantity").value;
     const optionsproduct = {
@@ -73,7 +90,6 @@ const goToCart = (e) => {
 
 
     // Envoie du tableau contenant la couleur et la quantité choisi au localStorage 
-
     addStorage(optionsproduct)
 
    
@@ -92,4 +108,4 @@ const goToCart = (e) => {
 
 // Envoye les informations sélectionnés par l'utilisateur et affiche un alerte confirmant l'ajoutau panier au click du bouton 
 const button = document.getElementById("addToCart");
-button.addEventListener("click", goToCart);
+button.addEventListener("click", addToCart);
