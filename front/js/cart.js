@@ -71,27 +71,31 @@ dataProduct.then(async (responseData) => {
         
 
 
-        // On veut que pour chache bouton supprimer (1 par produit) le produit soit enlever du panier
+        // On veut que pour chaque bouton supprimer (1 par produit), le produit soit enlever du panier
         listDeleteBtn[j].addEventListener("click", (event) => {
             event.stopPropagation();
 
             console.log(productsStorage[j].id, productsStorage[j].color);
+            // On récupère les block html de chaque produit du panier
             let blocks = document.querySelectorAll(".cart__item");
             console.log("data");
             console.log(blocks[j].dataset.id, blocks[j].dataset.color);
+            // On compare l'id et la couleur des produit dans le localstorage et les produits qui sont afficher, il y obligatoirement une correspondance puisque les produits affichés proviennent du localStorage
             if(productsStorage[j].id == blocks[j].dataset.id  && productsStorage[j].color == blocks[j].dataset.color){
                 console.log("OK !!");
-    
-                console.log(productsStorage.filter(el => el != productsStorage[j]));
-                localStorage.setItem("products", JSON.stringify(productsStorage.filter(el => el != productsStorage[j])));
+                
+                // On créé un nouveau tableau en gardant tous les produits du localStorage qui sont différents du produit que l'on veut supprimer 
+                const newProductsListe = productsStorage.filter(el => el != productsStorage[j]);
+                // On envoie ce nouveau tableau au localStorage
+                localStorage.setItem("products", JSON.stringify(newProductsListe));
 
+                // Un alerte qui confirme que la suppression à bien eut lieu
                 alert("Le produit a bien été supprimer de panier");
 
+                // On charche de nouveau la page cart pour que le panier s'actualise
                 window.location.href = document.location.origin + "/front/html/cart.html";
 
-            } else {
-                console.log("Pas OK !");
-            };
+            };// Il n'y a pas de else vu qu'il est impossible que le block html que l'on veut supprimer ne corresponde pas avec les infos du localStorage
         });
     };
 });
