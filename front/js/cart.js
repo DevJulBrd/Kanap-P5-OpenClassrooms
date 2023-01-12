@@ -4,33 +4,35 @@ let productsStorage = JSON.parse(localStorage.getItem("products"));
 // Tableaux prix et quantité
 let pricePack = [];
 let quantityChoice = [];
+// Récupération des informations des produits sélectionnés 
+const dataProduct = fetch("http://localhost:3000/api/products");
 
-//Affichage des produit ajouté au panier pas l'utilisateur 
-for (let j in productsStorage) {
-    // Récupération des informations des produits sélectionnés 
-    const dataProduct = fetch("http://localhost:3000/api/products/"+productsStorage[j].id);
+dataProduct.then(async (responseData) => {
+    const response = await responseData.json();
+    console.log(response);
 
-    dataProduct.then(async (responseData) => {
-        const response = await responseData.json();
-        console.log(response);
+    //Affichage des produit ajouté au panier pas l'utilisateur
+    for (let j in productsStorage) {
 
-
+        // On cherche information des produit par rapport aux id qu'il y a dans le localStorage
+        let responseByProduct = response.find(el => el._id === productsStorage[j].id);
+        console.log(responseByProduct);
         // Création du block HTML des produits du panier 
         const items = document.getElementById("cart__items");
         const blockProduct = `<article class="cart__item" data-id="${productsStorage[j].id}" data-color="${productsStorage[j].color}">
         <div class="cart__item__img">
-        <img src="${response.imageUrl}" alt="${response.altTxt}">
+        <img src="${responseByProduct.imageUrl}" alt="${responseByProduct.altTxt}">
         </div>
         <div class="cart__item__content">
         <div class="cart__item__content__description">
-            <h2>${response.name}</h2>
+            <h2>${responseByProduct.name}</h2>
             <p>${productsStorage[j].color}</p>
-            <p>${response.price}</p>
+            <p>${responseByProduct.price}</p>
         </div>
         <div class="cart__item__content__settings">
             <div class="cart__item__content__settings__quantity">
-            <p>Qté : ${productsStorage[j].quantity} </p>
-            <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="42">
+            <p>Qté :</p>
+            <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${productsStorage[j].quantity}">
             </div>
             <div class="cart__item__content__settings__delete">
             <p class="deleteItem">Supprimer</p>
@@ -39,15 +41,19 @@ for (let j in productsStorage) {
         </div>
         </article>`;
 
+        
         // Affichage du block HTML des produits du panier
         items.insertAdjacentHTML("beforeend", blockProduct);
 
-        // Calcul de la quantité d'article et du prix total du panier 
-        quantityChoice.push(productsStorage[j].quantity * 1);  
-        pricePack.push(productsStorage[j].quantity * response.price);
-
-        const reducer = (accumulator, currentValue) => accumulator + currentValue;
         
+
+        // Calcul de la quantité d'article et du prix total du panier 
+        const reducer = (accumulator, currentValue) => accumulator + currentValue;
+
+        quantityChoice.push(productsStorage[j].quantity * 1);  
+        pricePack.push(productsStorage[j].quantity * responseByProduct.price);
+            
+            
         // Affichage prix total du panier
         const totalPrice = pricePack.reduce(reducer);
         const showTotalPrice = document.getElementById("totalPrice");
@@ -62,12 +68,84 @@ for (let j in productsStorage) {
         // Suppression de produit du panier 
         let listDeleteBtn = document.querySelectorAll(".deleteItem");
         console.log(listDeleteBtn);
+        
+
+
         // On veut que pour chache bouton supprimer (1 par produit) le produit soit enlever du panier
-        listDeleteBtn[j].addEventListener("click",()=>{
+        listDeleteBtn[j].addEventListener("click", (event) => {
+            event.stopPropagation();
+
+            console.log(productsStorage[j].id, productsStorage[j].color);
+            let blocks = document.querySelectorAll(".cart__item");
+            console.log("data");
+            console.log(blocks[j].dataset.id, blocks[j].dataset.color);
+            if(productsStorage[j].id == blocks[j].dataset.id  && productsStorage[j].color == blocks[j].dataset.color){
+                console.log("OK !!");
+    
+                console.log(productsStorage.filter(el => el != productsStorage[j]));
+                localStorage.setItem("products", JSON.stringify(productsStorage.filter(el => el != productsStorage[j])));
+
+                alert("Le produit a bien été supprimer de panier");
+
+                window.location.href = document.location.origin + "/front/html/cart.html";
+
+            } else {
+                console.log("Pas OK !");
+            };
+
+
+
+            /*let filterSameId = productsStorage.filter(el  => el.id == productsStorage[j].id);
+            console.log(filterSameId);
+            let filterProductToDelete = filterSameId.filter(el => el.color == productsStorage[j].color);
+            console.log(filterProductToDelete);*/
+            
 
         });
-    });
-};
+        
+        /*listDeleteBtn.forEach((btn) => {
+            // On détermine qu'on click du bouton supprimer on enleve le produit du panier
+            btn.addEventListener("click" , (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            console.log(event);
+
+            // On ajoute au bouton supprimer les informations du produit, en locurence son id et sa couleur
+            let selectProductId = productsStorage[j].id;
+            console.log(selectProductId);
+            let selectProductColor = productsStorage[j].color;
+            console.log(selectProductColor);
+
+            // On détermine les conditions du nouveau tableau du localStorage 
+            // Si le produit que l'on veut supprimer a le même id qu'un autre produit présent dans le tableau du localStorage
+            if(productsStorage.filter(el => el.id == selectProductId)) {
+
+                // Alors on garde le/les produit(s) qui a/ont une couleur différente que le produit que l'ont veut supprimer
+                products = productsStorage.filter(el => el.color !== selectProductColor);
+                console.log(products);
+
+            // Si le produit que l'on veut supprimer a un id qui ne corresponde a aucun autre id
+            } else {
+
+                // Alors on garde tous les id différents du tableau du localStorage
+                products = productsStorage.filter(el => el.id !== selectProductId);
+                console.log(products);
+            };
+
+            // On envoie le nouveau tableau au localStorage 
+            localStorage.setItem("products", JSON.stringify(products));
+
+            // On mentionne à l'utilisateur que la suppression a bien était enregistré 
+            alert("Le produit a été supprimé du panier");
+            // On charge un nouvelle fois la page pour que le panier s'actualise 
+            //window.location.href = document.location.origin + "/front/html/cart.html";
+            });
+        }); */       
+    };
+});
+
+ 
+
         
 
 // Validation du formulaire au click du bouton de commande 
@@ -168,7 +246,7 @@ order.addEventListener("click", (e) => {
     console.log(products);
 
     // Dernière validation champ par champ du formulaire pour envoyer les infos si elles sont correctemet renseignées et qu'il y a bien des produits dans le panier 
-    if(checkFirstName() && checkLastName() && checkAdress() && checkCity() && checkEmail() && products.lenght > 0) {
+    if(checkFirstName() && checkLastName() && checkAdress() && checkCity() && checkEmail() && products == null) {
         // On envoie les infos de l'utilisateur dans le localStorage
         localStorage.setItem("contact", JSON.stringify(contact));
 
