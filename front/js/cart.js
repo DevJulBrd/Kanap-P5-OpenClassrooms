@@ -92,55 +92,7 @@ dataProduct.then(async (responseData) => {
             } else {
                 console.log("Pas OK !");
             };
-
-
-
-            /*let filterSameId = productsStorage.filter(el  => el.id == productsStorage[j].id);
-            console.log(filterSameId);
-            let filterProductToDelete = filterSameId.filter(el => el.color == productsStorage[j].color);
-            console.log(filterProductToDelete);*/
-            
-
         });
-        
-        /*listDeleteBtn.forEach((btn) => {
-            // On détermine qu'on click du bouton supprimer on enleve le produit du panier
-            btn.addEventListener("click" , (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            console.log(event);
-
-            // On ajoute au bouton supprimer les informations du produit, en locurence son id et sa couleur
-            let selectProductId = productsStorage[j].id;
-            console.log(selectProductId);
-            let selectProductColor = productsStorage[j].color;
-            console.log(selectProductColor);
-
-            // On détermine les conditions du nouveau tableau du localStorage 
-            // Si le produit que l'on veut supprimer a le même id qu'un autre produit présent dans le tableau du localStorage
-            if(productsStorage.filter(el => el.id == selectProductId)) {
-
-                // Alors on garde le/les produit(s) qui a/ont une couleur différente que le produit que l'ont veut supprimer
-                products = productsStorage.filter(el => el.color !== selectProductColor);
-                console.log(products);
-
-            // Si le produit que l'on veut supprimer a un id qui ne corresponde a aucun autre id
-            } else {
-
-                // Alors on garde tous les id différents du tableau du localStorage
-                products = productsStorage.filter(el => el.id !== selectProductId);
-                console.log(products);
-            };
-
-            // On envoie le nouveau tableau au localStorage 
-            localStorage.setItem("products", JSON.stringify(products));
-
-            // On mentionne à l'utilisateur que la suppression a bien était enregistré 
-            alert("Le produit a été supprimé du panier");
-            // On charge un nouvelle fois la page pour que le panier s'actualise 
-            //window.location.href = document.location.origin + "/front/html/cart.html";
-            });
-        }); */       
     };
 });
 
@@ -246,7 +198,7 @@ order.addEventListener("click", (e) => {
     console.log(products);
 
     // Dernière validation champ par champ du formulaire pour envoyer les infos si elles sont correctemet renseignées et qu'il y a bien des produits dans le panier 
-    if(checkFirstName() && checkLastName() && checkAdress() && checkCity() && checkEmail() && products == null) {
+    if(checkFirstName() && checkLastName() && checkAdress() && checkCity() && checkEmail() && products.length > 0) {
         // On envoie les infos de l'utilisateur dans le localStorage
         localStorage.setItem("contact", JSON.stringify(contact));
 
