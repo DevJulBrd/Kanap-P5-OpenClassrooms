@@ -88,18 +88,16 @@ const addToCart = (e) => {
         quantity: quantity
     };
 
-
-    // Envoie du tableau contenant la couleur et la quantité choisi au localStorage 
-    addStorage(optionsproduct)
-
-   
-
     // Oblige l'utilisateur a sélectionner une couleur + message d'alerte lui demandant dans choisir une 
     if (!color) {
         erreur = "Veuillez choisir une chouleur pour votre produit";
         alert(erreur);
         e.preventDefault();
         return false;
+        
+    } else {
+        // Envoie du tableau contenant la couleur et la quantité choisi au localStorage 
+        addStorage(optionsproduct);
     };
     
     // Affiche de l'alerte
