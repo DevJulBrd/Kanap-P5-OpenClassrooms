@@ -1,14 +1,19 @@
 // Récupération des éléments du localstorage
 let productsStorage = JSON.parse(localStorage.getItem("products"));
 
-// Tableaux prix et quantité
-let pricePack = [];
-let quantityChoice = [];
+// Eléments pour calculer la quantité total et le prix total
+const totalQuantityShow = document.querySelector("#totalQuantity");
+const totalPriceShow = document.querySelector("#totalPrice");
+let response;
+
+let calculateTotalQuantity = 0;
+let calculateTotalPrice = 0;
+
 // Récupération des informations des produits sélectionnés 
 const dataProduct = fetch("http://localhost:3000/api/products");
 
 dataProduct.then(async (responseData) => {
-    const response = await responseData.json();
+    response = await responseData.json();
     console.log(response);
 
     //Affichage des produit ajouté au panier pas l'utilisateur
@@ -41,36 +46,34 @@ dataProduct.then(async (responseData) => {
         </div>
         </article>`;
 
-        
         // Affichage du block HTML des produits du panier
         items.insertAdjacentHTML("beforeend", blockProduct);
 
+        // Calcul et affichage de la quantité total et du prix total
+        const itemQuantity = document.querySelectorAll(".itemQuantity")[j];
+
+        // On utilise les valeurs du haut de la page pour calculer la quantité total et le prix total avec les informatiosn du localStorage et le prix des produit
+        calculateTotalPrice = calculateTotalPrice + (+responseByProduct.price * +productsStorage[j].quantity);
+        calculateTotalQuantity = calculateTotalQuantity + +productsStorage[j].quantity;
+
         
+        // Actualise la quantité total et le prix total en prenant en conte les input number qui change la quantité de produit
+        itemQuantity.addEventListener("input", () => {
+            productsStorage[j].quantity = +itemQuantity.value;
+            // On met le chagement de quantité dans le localStorage 
+            localStorage.setItem("products", JSON.stringify(productsStorage));
 
-        // Calcul de la quantité d'article et du prix total du panier 
-        const reducer = (accumulator, currentValue) => accumulator + currentValue;
-
-        quantityChoice.push(productsStorage[j].quantity * 1);  
-        pricePack.push(productsStorage[j].quantity * responseByProduct.price);
-            
-            
-        // Affichage prix total du panier
-        const totalPrice = pricePack.reduce(reducer);
-        const showTotalPrice = document.getElementById("totalPrice");
-        showTotalPrice.textContent = totalPrice;
-        
-        // Affichage quantité total du panier 
-        const totalQuantity = quantityChoice.reduce(reducer);
-        const showTotalQuantity = document.getElementById("totalQuantity");
-        showTotalQuantity.textContent = totalQuantity;
-
+            // On créé un nouveau calcul avec les fonctions qui sont plus bas
+            const newPrice = calculateNewPrice();
+            let newQuantity = 0;
+            newQuantity = productsStorage.reduce((accumulateur, currentValue) => +accumulateur + +currentValue.quantity, newQuantity);
+            // On affiche les nouveaux totaux sur la page 
+            displayTotal(newQuantity,newPrice)
+        });
 
         // Suppression de produit du panier 
         let listDeleteBtn = document.querySelectorAll(".deleteItem");
-        console.log(listDeleteBtn);
         
-
-
         // On veut que pour chaque bouton supprimer (1 par produit), le produit soit enlever du panier
         listDeleteBtn[j].addEventListener("click", (event) => {
             event.stopPropagation();
@@ -98,10 +101,29 @@ dataProduct.then(async (responseData) => {
             };// Il n'y a pas de else vu qu'il est impossible que le block html que l'on veut supprimer ne corresponde pas avec les infos du localStorage
         });
     };
+    // On affiche les totaux sur la page
+    displayTotal(calculateTotalQuantity,calculateTotalPrice);
 });
 
- 
+// Fonction qui permet d'afficher les totaux quantité et prix 
+const displayTotal = (a,b) => {
+    totalQuantityShow.innerText = a;
+    totalPriceShow.innerText = b;
+};
 
+// Fonction qui permet de recalculer les totaux en fonction des input qui gère la quantité que l'utilisateur choisit 
+const calculateNewPrice = () => {
+    // On remet le calcul a zéro 
+    calculateTotalPrice = 0;
+
+    // On fait tourner la même boucle que plus pour récupérer les informations 
+    for (let j in productsStorage){
+        let responseByProduct = response.find(el => el._id === productsStorage[j].id);
+        calculateTotalPrice = calculateTotalPrice + (+responseByProduct.price * +productsStorage[j].quantity);
+    };
+
+    return calculateTotalPrice;
+};
         
 
 // Validation du formulaire au click du bouton de commande 
@@ -251,5 +273,6 @@ order.addEventListener("click", (e) => {
         alert("Remplissez les champs correctement /n Ou veillez sélectionner un produit");
     };
 });
+
 
 
