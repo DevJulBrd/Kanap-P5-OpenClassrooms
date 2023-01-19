@@ -7,6 +7,15 @@ const urlParams = new URLSearchParams(queryString);
 const id = urlParams.get('id');
 console.log(id);
 
+// Fonction qui permet de tirer le tableau 
+const sortProductStorage =  (a, b) => {
+    if (a.id < b.id)
+       return -1;
+    if (a.id > b.id )
+       return 1;
+    return 0;
+};
+
 // Récupération et affichage des infos du produit a partir de son id
 const dataProduct = fetch('http://localhost:3000/api/products/'+id);
 
@@ -62,6 +71,9 @@ const addStorage = (product) => {
         } else {
             // On ajoute donc ce nouveau produit au tableau 
             productStorage.push(product);
+            // Que le tri pour qu'ils apparaissent dans l'ordre souhaité
+            productStorage.sort(sortProductStorage);
+            console.log(productStorage);
         }
     } 
     // Si le tableau est vide
@@ -69,6 +81,9 @@ const addStorage = (product) => {
         // On initialise le tableau
         productStorage = [];
         productStorage.push(product);
+        // Que le tri pour qu'ils apparaissent dans l'ordre souhaité
+        productStorage.sort(sortProductStorage);
+        console.log(productStorage);
     };
         
     
@@ -90,7 +105,7 @@ const addToCart = (e) => {
 
     // Oblige l'utilisateur a sélectionner une couleur + message d'alerte lui demandant dans choisir une 
     if (!color) {
-        erreur = "Veuillez choisir une chouleur pour votre produit";
+        erreur = "Veuillez choisir une couleur pour votre produit";
         alert(erreur);
         e.preventDefault();
         return false;
