@@ -270,7 +270,7 @@ order.addEventListener("click", (e) => {
     // Si un ou plusieurs des champs n'est pas correctement renseigné ou que l'utilisateur n'a pas ajouté de produit au panier     
     }else {
         // On affiche une alerte demandant à l'utilisateur de remplir les champs correctement ou de choisir un produit
-        alert("Remplissez les champs correctement /n Ou veillez sélectionner un produit");
+        alert("Remplissez les champs correctement. Ou veillez sélectionner un produit");
     };
 });
 
