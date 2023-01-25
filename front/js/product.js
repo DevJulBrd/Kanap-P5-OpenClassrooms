@@ -17,40 +17,49 @@ const sortProductStorage =  (a, b) => {
 };
 
 // Récupération et affichage des infos du produit a partir de son id
-const dataProduct = fetch('http://localhost:3000/api/products/'+id);
+const dataProduct = fetch('http://localhost:3000/api/products/' + id);
 
 dataProduct.then(async (responseData) => {
-    const response = await responseData.json();
-    console.log(response);
+    if(responseData.ok) {
+        const response = await responseData.json();
+        console.log(response);
 
-    // Affichage de l'image du produit
-    const productImgAlt = `<img src="${response.imageUrl}" alt="${response.altTxt}">`;
-    const item_img = document.getElementById("item_img");
-    item_img.insertAdjacentHTML("afterbegin", productImgAlt);
+        // Affichage de l'image du produit
+        const productImgAlt = `<img src="${response.imageUrl}" alt="${response.altTxt}">`;
+        const item_img = document.getElementById("item_img");
+        item_img.insertAdjacentHTML("afterbegin", productImgAlt);
 
-    // Affichage du nom du produit
-    const productName = `${response.name}`; 
-    const title = document.getElementById("title");
-    title.textContent = productName;
-
-    // Affichage du prix du produit
-    const productPrice = `${response.price}`;
-    const price = document.getElementById("price");
-    price.textContent = productPrice;
-        
-    // Affichage de la description du produit
-    const productDescription = `${response.description}`;
-    const description = document.getElementById("description");
-    description.textContent = productDescription;
-
-    // Affichage des couleurs du produit
-    const colors = response.colors;
-    for (let i in colors) {
-        const blockColors = `<option value="${colors[i]}">${colors[i]}</option>`;
-        const colorSelect = document.getElementById("colors");
-        colorSelect.insertAdjacentHTML("beforeend", blockColors); 
-    };    
+        // Affichage du nom du produit
+        const productName = `${response.name}`; 
+        const title = document.getElementById("title");
+        title.textContent = productName;
+    
+        // Affichage du prix du produit
+        const productPrice = `${response.price}`;
+        const price = document.getElementById("price");
+        price.textContent = productPrice;
+                
+        // Affichage de la description du produit
+        const productDescription = `${response.description}`;
+        const description = document.getElementById("description");
+        description.textContent = productDescription;
+    
+        // Affichage des couleurs du produit
+        const colors = response.colors;
+        for (let i in colors) {
+            const blockColors = `<option value="${colors[i]}">${colors[i]}</option>`;
+            const colorSelect = document.getElementById("colors");
+            colorSelect.insertAdjacentHTML("beforeend", blockColors); 
+        };
+    } else {
+        // On informe l'utilisateur que le produit qu'il veut consulter n'existe pas
+        alert("Le produit que vous tentez de consulter n'existe pas");
+        // On le redirige vers la page d'acceuil
+        window.location.href = document.location.origin + "/front/html/index.html";
+    };     
 });
+
+    
 
 
 // Fonction qui gère l'ajout des produit au local storage en respectant les conditions précisés
